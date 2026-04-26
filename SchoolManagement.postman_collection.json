@@ -1,0 +1,184 @@
+{
+  "info": {
+    "_postman_id": "school-mgmt-api-v1",
+    "name": "School Management API",
+    "description": "REST APIs for managing schools with proximity-based sorting.\n\n## Base URL\n`http://localhost:3000`\n\n## Endpoints\n- `POST /addSchool` — Add a new school\n- `GET /listSchools` — Retrieve schools sorted by proximity",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string",
+      "description": "Change this to your deployed API URL"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Root – API Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/", "host": ["{{base_url}}"], "path": [""] },
+            "description": "Returns API metadata and available endpoints."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{base_url}}/" } },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"message\": \"School Management API is running 🚀\",\n  \"version\": \"1.0.0\",\n  \"endpoints\": {\n    \"addSchool\": \"POST /addSchool\",\n    \"listSchools\": \"GET  /listSchools?latitude=<lat>&longitude=<lon>\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/health", "host": ["{{base_url}}"], "path": ["health"] },
+            "description": "Lightweight liveness probe — use for uptime monitoring."
+          },
+          "response": [
+            {
+              "name": "200 Healthy",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{base_url}}/health" } },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"status\": \"healthy\",\n  \"timestamp\": \"2024-01-15T10:30:00.000Z\",\n  \"uptime\": \"120s\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Schools",
+      "item": [
+        {
+          "name": "Add School – Success",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Delhi Public School\",\n  \"address\": \"Sector 45, Gurugram, Haryana 122003\",\n  \"latitude\": 28.4595,\n  \"longitude\": 77.0266\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/addSchool", "host": ["{{base_url}}"], "path": ["addSchool"] },
+            "description": "Adds a new school. All four fields are required."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Delhi Public School\",\n  \"address\": \"Sector 45, Gurugram, Haryana 122003\",\n  \"latitude\": 28.4595,\n  \"longitude\": 77.0266\n}"
+                },
+                "url": { "raw": "{{base_url}}/addSchool" }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"message\": \"School added successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Delhi Public School\",\n    \"address\": \"Sector 45, Gurugram, Haryana 122003\",\n    \"latitude\": 28.4595,\n    \"longitude\": 77.0266\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add School – Validation Error",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"address\": \"Some Street\",\n  \"latitude\": 999,\n  \"longitude\": 77.02\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/addSchool", "host": ["{{base_url}}"], "path": ["addSchool"] },
+            "description": "Demonstrates validation failure response (empty name, invalid latitude)."
+          },
+          "response": [
+            {
+              "name": "422 Unprocessable Entity",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": false,\n  \"message\": \"Validation failed\",\n  \"errors\": [\n    { \"field\": \"name\", \"message\": \"School name is required\" },\n    { \"field\": \"latitude\", \"message\": \"Latitude must be a number between -90 and 90\" }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add School – Duplicate",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Delhi Public School\",\n  \"address\": \"Sector 45, Gurugram, Haryana 122003\",\n  \"latitude\": 28.4595,\n  \"longitude\": 77.0266\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/addSchool", "host": ["{{base_url}}"], "path": ["addSchool"] },
+            "description": "Sending the same school twice returns 409 Conflict."
+          },
+          "response": [
+            {
+              "name": "409 Conflict",
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": false,\n  \"message\": \"A school with the same name and address already exists.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Schools – Sorted by Proximity",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/listSchools?latitude=28.4595&longitude=77.0266",
+              "host": ["{{base_url}}"],
+              "path": ["listSchools"],
+              "query": [
+                { "key": "latitude",  "value": "28.4595", "description": "User's latitude  (required, -90 to 90)" },
+                { "key": "longitude", "value": "77.0266", "description": "User's longitude (required, -180 to 180)" }
+              ]
+            },
+            "description": "Returns all schools sorted by haversine distance from the user's location. Closest schools appear first. Each school includes a `distance_km` field."
+          },
+          "response": [
+            {
+              "name": "200 OK – Schools Found",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"message\": \"Schools fetched and sorted by proximity successfully\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"Delhi Public School\",\n      \"address\": \"Sector 45, Gurugram, Haryana 122003\",\n      \"latitude\": 28.4595,\n      \"longitude\": 77.0266,\n      \"distance_km\": 0\n    },\n    {\n      \"id\": 3,\n      \"name\": \"Ryan International School\",\n      \"address\": \"Sector 40, Gurugram, Haryana 122001\",\n      \"latitude\": 28.4551,\n      \"longitude\": 77.0791,\n      \"distance_km\": 4.6123\n    },\n    {\n      \"id\": 2,\n      \"name\": \"The Shri Ram School\",\n      \"address\": \"Moulsari Avenue, DLF Phase 3, Gurugram\",\n      \"latitude\": 28.4942,\n      \"longitude\": 77.0874,\n      \"distance_km\": 7.2841\n    }\n  ],\n  \"total\": 3,\n  \"userLocation\": {\n    \"latitude\": 28.4595,\n    \"longitude\": 77.0266\n  }\n}"
+            },
+            {
+              "name": "200 OK – No Schools",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"message\": \"No schools found in the database.\",\n  \"data\": [],\n  \"total\": 0,\n  \"userLocation\": { \"latitude\": 28.4595, \"longitude\": 77.0266 }\n}"
+            },
+            {
+              "name": "422 – Missing Parameters",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": false,\n  \"message\": \"Validation failed\",\n  \"errors\": [\n    { \"field\": \"latitude\",  \"message\": \"Latitude query parameter is required\" },\n    { \"field\": \"longitude\", \"message\": \"Longitude query parameter is required\" }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
